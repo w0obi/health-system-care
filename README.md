@@ -17,3 +17,14 @@
 
 ### 기술 스텍
 <img width="200" src="https://github.com/user-attachments/assets/5eb17341-7c2d-495c-b156-5e035ed93dcd">
+
+### 기능 설명
+
+<table style="table-layout: auto; width: 100%;">
+  <tr>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">운동 날짜 기록 및 조회</td><td style="text-align: center;">각 운동의 날짜를 기록하고, 해당 날짜에 수행한 운동 목록을 조회</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">개인정보 조회</td><td style="text-align: center;">각 운동의 날짜를 기록하고, 해당 날짜에 수행한 운동 목록을 조회개인정보(나이, 성별, 체중, 키 등)를 입력하고 조회</td>
+  </tr>  
+</table>
