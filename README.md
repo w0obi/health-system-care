@@ -16,15 +16,40 @@
 <br>
 
 ### 기술 스텍
-<img width="200" src="https://github.com/user-attachments/assets/5eb17341-7c2d-495c-b156-5e035ed93dcd">
-
-### 기능 설명
-
-<table style="table-layout: auto; width: 100%;">
+<table>
   <tr>
-    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">운동 날짜 기록 및 조회</td><td style="text-align: center;">각 운동의 날짜를 기록하고, 해당 날짜에 수행한 운동 목록을 조회</td>
+    <td>
+      <img width="100" src="https://github.com/user-attachments/assets/ef5e973a-3f97-4dcb-973a-c9e2ba0197fb">
+    </td>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">jdk 17</td>
   </tr>
   <tr>
-    <td style="text-align: center;">개인정보 조회</td><td style="text-align: center;">각 운동의 날짜를 기록하고, 해당 날짜에 수행한 운동 목록을 조회개인정보(나이, 성별, 체중, 키 등)를 입력하고 조회</td>
+    <td>
+      <img width="100" src="https://github.com/user-attachments/assets/5eb17341-7c2d-495c-b156-5e035ed93dcd">
+    </td>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">oracle 11</td>
+  </tr>
+</table>
+<br><br>
+
+### 기능 설명
+<table style="table-layout: auto; width: 100%;">
+  <tr>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">운동 날짜 기록 및 조회</td>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
+      <ul>
+        <li>각 운동의 날짜를 기록</li>
+        <li>해당 날짜에 수행한 운동 목록 조회</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">개인정보 조회</td>
+    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
+      <ul>
+        <li>회원가입 시 개인정보(나이, 성별, 체중, 키 등) 입력</li>
+        <li>개인정보 조회</li>
+      </ul>
+    </td>
   </tr>  
 </table>
