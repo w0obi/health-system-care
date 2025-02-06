@@ -14,4 +14,4 @@
 <br>
 
 ### 기술 스텍
-<img width="200" src="https://github.com/user-attachments/assets/8e0dddf8-bb53-44f5-8134-bdea0423667b">
+<img width="200" src="https://github.com/user-attachments/assets/5eb17341-7c2d-495c-b156-5e035ed93dcd">
