@@ -181,14 +181,14 @@ public class HealthManagementProgram extends JFrame {
 		if (exercise != null) {
 			switch (exercise) {
 			case "팔굽혀펴기":
-				ImageIcon icon = new ImageIcon("push1.png");
+				ImageIcon icon = new ImageIcon("./img/push1.png");
 				Image img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
 				photo1Label.setIcon(icon);
 
-				icon = new ImageIcon("push2.png");
+				icon = new ImageIcon("./img/push2.png");
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
@@ -196,14 +196,14 @@ public class HealthManagementProgram extends JFrame {
 				photo2Label.setIcon(icon);
 				break;
 			case "윗몸일으키기":
-				icon = new ImageIcon("situp1.png");
+				icon = new ImageIcon("./img/situp1.png");
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
 				photo1Label.setIcon(icon);
 
-				icon = new ImageIcon("situp2.png");
+				icon = new ImageIcon("./img/situp2.png");
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
@@ -212,14 +212,14 @@ public class HealthManagementProgram extends JFrame {
 
 				break;
 			case "스쿼트":
-				icon = new ImageIcon("squat1.png");
+				icon = new ImageIcon("./img/squat1.png");
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
 				photo1Label.setIcon(icon);
 
-				icon = new ImageIcon("squat2.png");
+				icon = new ImageIcon("./img/squat2.png");
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
