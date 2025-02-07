@@ -2,15 +2,21 @@ package mini_project_a;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.StringReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -56,8 +62,7 @@ public class HealthManagementProgram extends JFrame {
 	private JTextField bmiField;
 
 	// 문의사항 필드
-	private JTextField titleField;
-	private JTextArea detailArea;
+	private JTable inquiryTable;
 
 	public HealthManagementProgram(String username) {
 
@@ -145,6 +150,8 @@ public class HealthManagementProgram extends JFrame {
 		centerPanel.add(photo1Label);
 		centerPanel.add(photo2Label);
 
+		updatePhotos("nomal");
+		
 		centerPanel.add(new JLabel("오늘 날짜를 입력하세요 ex)YYYY-MM-DD:"));
 		LocalDate today = LocalDate.now();
 		dateField = new JTextField(String.valueOf(today)); // 현재 날짜로 기본값 설정
@@ -167,7 +174,7 @@ public class HealthManagementProgram extends JFrame {
 		// 하단 버튼
 		JButton button = new JButton("저장");
 		button.addActionListener(e -> {
-			System.err.println(selectedExercise + "" + username);
+//			System.err.println(selectedExercise + "" + username);
 			modifyExercise(selectedExercise, username);
 			saveExerciseData(username);
 		});
@@ -180,15 +187,30 @@ public class HealthManagementProgram extends JFrame {
 	public void updatePhotos(String exercise) {
 		if (exercise != null) {
 			switch (exercise) {
-			case "팔굽혀펴기":
-				ImageIcon icon = new ImageIcon("./img/push1.png");
+			case "nomal":
+				ImageIcon icon = new ImageIcon(getClass().getResource("/mini_project_a/img/women.png"));
 				Image img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
 				photo1Label.setIcon(icon);
+				
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/running.png"));
+				img = icon.getImage();
+				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
+				icon = new ImageIcon(img);
 
-				icon = new ImageIcon("./img/push2.png");
+				photo2Label.setIcon(icon);
+				break;
+			case "팔굽혀펴기":
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/push1.png"));
+				img = icon.getImage();
+				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
+				icon = new ImageIcon(img);
+
+				photo1Label.setIcon(icon);
+
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/push2.png"));
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
@@ -196,14 +218,14 @@ public class HealthManagementProgram extends JFrame {
 				photo2Label.setIcon(icon);
 				break;
 			case "윗몸일으키기":
-				icon = new ImageIcon("./img/situp1.png");
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/situp1.png"));
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
 				photo1Label.setIcon(icon);
 
-				icon = new ImageIcon("./img/situp2.png");
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/situp2.png"));
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
@@ -212,14 +234,14 @@ public class HealthManagementProgram extends JFrame {
 
 				break;
 			case "스쿼트":
-				icon = new ImageIcon("./img/squat1.png");
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/squat1.png"));
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
 				photo1Label.setIcon(icon);
 
-				icon = new ImageIcon("./img/squat2.png");
+				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/squat2.png"));
 				img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
@@ -283,20 +305,24 @@ public class HealthManagementProgram extends JFrame {
 						"INSERT INTO records (exercise_id, exercise_date, exercise_count, exercise_time, exercise_intensity, username) VALUES (?, ?, ?, ?, ?, ?)");
 
 				stmt.setInt(1, exercise_id);
-				System.err.println(exercise_id);
 				stmt.setDate(2, java.sql.Date.valueOf(String.valueOf(date)));
-				System.err.println(java.sql.Date.valueOf(String.valueOf(date)));
 				stmt.setInt(3, Integer.parseInt(count));
-				System.err.println(Integer.parseInt(count));
 				stmt.setInt(4, Integer.parseInt(time));
-				System.err.println(Integer.parseInt(time));
 				stmt.setString(5, intensity);
-				System.err.println(intensity);
 				stmt.setString(6, username);
-				System.err.println(username);
-
 				stmt.executeUpdate();
+				
+//				System.err.println(exercise_id);
+//				System.err.println(java.sql.Date.valueOf(String.valueOf(date)));
+//				System.err.println(Integer.parseInt(count));
+//				System.err.println(Integer.parseInt(time));
+//				System.err.println(intensity);
+//				System.err.println(username);
 
+				// 입력 필드 초기화
+	            countField.setText("");
+	            timeField.setText("");
+	            intensityField.setText("");
 				JOptionPane.showMessageDialog(this, "운동 데이터가 저장되었습니다.");
 
 			} catch (SQLException ex) {
@@ -328,34 +354,49 @@ public class HealthManagementProgram extends JFrame {
 
 	// 운동 기록 조회 불러오기 메소드
 	public void fetchExerciseData(String username) {
-		try {
-			HealthsysManager.getInstance().getAppConnection();
+	    try {
+	        HealthsysManager.getInstance().getAppConnection();
 
-			PreparedStatement stmt = HealthsysManager.appConn
-					.prepareStatement("SELECT * FROM records WHERE username = ? ORDER BY exercise_date DESC");
+	        String query = "SELECT * FROM records WHERE username = ? ORDER BY exercise_date DESC";
+	        try (PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(query)) {
+	            stmt.setString(1, username);
+	            try (ResultSet rs = stmt.executeQuery()) {
 
-			stmt.setString(1, username);
-			ResultSet rs = stmt.executeQuery();
+	                List<Object[]> dataList = new ArrayList<>(); // 동적 리스트 사용
+	                while (rs.next()) {
+	                    String exercise_id = rs.getString("exercise_id");
+	                    
+	                    // exercise 테이블 조회
+	                    String exerciseQuery = "SELECT * FROM exercises WHERE exercise_id = ?";
+	                    try (PreparedStatement exerciseStmt = HealthsysManager.appConn.prepareStatement(exerciseQuery)) {
+	                        exerciseStmt.setString(1, exercise_id);
+	                        try (ResultSet exerciseRs = exerciseStmt.executeQuery()) {
+	                            if (exerciseRs.next()) { // 결과가 있을 경우에만 가져오기
+	                                Object[] row = new Object[]{
+	                                    exerciseRs.getString("exercise_name"),
+	                                    rs.getDate("exercise_date"),
+	                                    rs.getInt("exercise_count"),
+	                                    rs.getInt("exercise_time"),
+	                                    rs.getString("exercise_intensity")
+	                                };
+	                                dataList.add(row);
+	                            }
+	                        }
+	                    }
+	                }
 
-			Object[][] data = new Object[30][5]; // 최대 30개의 데이터를 담을 수 있도록 배열 크기 설정
-			int rowIndex = 0;
-			while (rs.next()) {
-				data[rowIndex][0] = rs.getString("exercise_id");
-				data[rowIndex][1] = rs.getDate("exercise_date");
-				data[rowIndex][2] = rs.getInt("exercise_count");
-				data[rowIndex][3] = rs.getInt("exercise_time"); // 운동 시간 열 추가
-				data[rowIndex][4] = rs.getString("exercise_intensity"); // 운동 강도 열 추가
-				rowIndex++;
-			}
-
-			String[] columnNames = { "운동종목", "날짜", "횟수", "운동 시간(분)", "운동 강도" };
-			exerciseTable.setModel(new DefaultTableModel(data, columnNames));
-
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, "데이터 불러오기 중 오류가 발생했습니다.");
-		}
+	                // 리스트를 배열로 변환
+	                Object[][] data = dataList.toArray(new Object[0][]);
+	                String[] columnNames = { "운동종목", "날짜", "횟수", "운동 시간(분)", "운동 강도" };
+	                exerciseTable.setModel(new DefaultTableModel(data, columnNames));
+	            }
+	        }
+	    } catch (SQLException ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(this, "데이터 불러오기 중 오류가 발생했습니다.");
+	    }
 	}
+
 
 	// 개인정보 탭 패널 생성 메소드
 	public JPanel createPersonalInfoPanel(String username) {
@@ -447,11 +488,11 @@ public class HealthManagementProgram extends JFrame {
 					stmt.setDouble(5, roundedBmi);
 					stmt.setString(6, username);
 
-					System.err.println(name);
-					System.err.println(age);
-					System.err.println(height);
-					System.err.println(weight);
-					System.err.println(roundedBmi);
+//					System.err.println(name);
+//					System.err.println(age);
+//					System.err.println(height);
+//					System.err.println(weight);
+//					System.err.println(roundedBmi);
 
 					// 업데이트 실행
 					int rowsUpdated = stmt.executeUpdate(); // 변경된 행 수 반환
@@ -499,75 +540,144 @@ public class HealthManagementProgram extends JFrame {
 
 	// 문의사항 버튼 생성 메소드
 	public JButton createInquiryButton(String username) {
+	    JButton inquiryButton = new JButton("문의사항");
 
-		JButton inquiryButton = new JButton("문의사항");
+	    inquiryButton.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent ae) {
+	            // 문의사항 다이얼로그 생성
+	            JDialog inquiryDialog = new JDialog(HealthManagementProgram.this, "문의사항", true);
+	            inquiryDialog.setLayout(new BorderLayout());
 
-		inquiryButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				// 문의사항 다이얼로그 생성
-				JDialog inquiryDialog = new JDialog(HealthManagementProgram.this, "문의사항", true);
-				inquiryDialog.setLayout(new BorderLayout());
+	            // 문의사항 테이블
+	            String[] columnNames = { "문의제목", "문의내용", "문의날짜", "처리상태", "관리자답변", "아이디" };
+	            DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-				Object[][] data = {};
-				String[] columnNames = { "문의제목", "문의내용", "문의날짜", "처리상태", "관리자답변", "아이디" };
+	            if (inquiryTable == null) {
+	                inquiryTable = new JTable(model);  // 최초에만 테이블을 생성
+	            } else {
+	                inquiryTable.setModel(model);  // 기존 테이블 모델을 갱신
+	            }
 
-				JTable inquiryTable = new JTable(data, columnNames);
-				JScrollPane scrollPane = new JScrollPane(inquiryTable);
+	            inquiryTable.setEnabled(false);  // 셀 수정 비활성화
+	            
+	            // 기존 데이터 로드
+	            loadInquiryData(model, username);
 
-				inquiryDialog.add(scrollPane, BorderLayout.EAST);
+	            JScrollPane tableScrollPane = new JScrollPane(inquiryTable);
+	            inquiryDialog.add(tableScrollPane, BorderLayout.EAST);
 
-				Container c = getContentPane();
-				c.setLayout(new BorderLayout());
+	            // 제목 및 내용 입력을 위한 패널
+	            JPanel inputPanel = new JPanel(new GridBagLayout());
+	            inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-				// 문의사항 입력란 생성
-				titleField = new JTextField();// 문의 제목
-				c.add(titleField, BorderLayout.CENTER);
-				detailArea = new JTextArea(10, 20);// 문의 내용
-				c.add(detailArea, BorderLayout.CENTER);
+	            GridBagConstraints gbc = new GridBagConstraints();
+	            gbc.fill = GridBagConstraints.BOTH;
+	            gbc.insets = new Insets(5, 5, 5, 5);
+	            gbc.gridx = 0;
+	            gbc.weightx = 1.0; // 너비 확장
 
-				inquiryDialog.add(c, BorderLayout.WEST);
+	            // 제목 입력란 (높이 비율 2)
+	            gbc.gridy = 0;
+	            gbc.weighty = 0.2; // 20%
+	            JTextField titleField = new JTextField();
+	            inputPanel.add(titleField, gbc);
 
-				// 저장 버튼 생성
-				JButton saveButton = new JButton("저장");
-				saveButton.addActionListener(ev -> {
+	            // 내용 입력란 (높이 비율 8)
+	            gbc.gridy = 1;
+	            gbc.weighty = 0.8; // 80%
+	            JTextArea detailArea = new JTextArea();
+	            JScrollPane detailScrollPane = new JScrollPane(detailArea);
+	            inputPanel.add(detailScrollPane, gbc);
 
-					// 필드를 텍스트로 변환
-					String title = titleField.getText();
-					String detail = detailArea.getText();
+	            // 저장 버튼 (아래쪽)
+	            JButton saveButton = new JButton("저장");
+	            saveButton.addActionListener(ev -> {
+	                String title = titleField.getText();
+	                String detail = detailArea.getText();
 
-					try {
-						LocalDate today = LocalDate.now();
-						HealthsysManager.getInstance().getAppConnection();
-						PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
-								"INSERT INTO inquiries (inquiry_subject , inquiry_details , inquiry_date , username) VALUES (?, ?, ?, ?)");
-						stmt.setString(1, title);
-						stmt.setString(2, detail);
-						stmt.setDate(3, java.sql.Date.valueOf(today));
-						stmt.setString(4, username);
+	                // 유효성 검사
+	                if (title.isEmpty()) {
+	                    JOptionPane.showMessageDialog(inquiryDialog, "제목을 입력해 주세요.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+	                    return;
+	                }
 
-						stmt.executeUpdate();
-						JOptionPane.showMessageDialog(new JFrame(), "문의사항 데이터가 저장되었습니다.");
-					} catch (SQLException ex) {
-						ex.printStackTrace();
-						JOptionPane.showMessageDialog(new JFrame(), "데이터 저장 중 오류가 발생했습니다.");
-					}
+	                if (detail.isEmpty()) {
+	                    JOptionPane.showMessageDialog(inquiryDialog, "내용을 입력해 주세요.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+	                    return;
+	                }
 
-				});
+	                try {
+	                    HealthsysManager.getInstance().getAppConnection();
+	                    PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
+	                        "INSERT INTO inquiries (inquiry_subject, inquiry_details, username) VALUES (?, ?, ?)"
+	                    );
+	                    stmt.setString(1, title);
+	                    stmt.setCharacterStream(2, new StringReader(detail), detail.length());
+	                    stmt.setString(3, username);
+	                    stmt.executeUpdate();
 
-				// 다이얼로그에 컴포넌트 추가
-				inquiryDialog.add(new JScrollPane(detailArea), BorderLayout.CENTER);
-				inquiryDialog.add(saveButton, BorderLayout.SOUTH);
+	                    // 데이터 저장 후 JTable 갱신 (중복 방지)
+	                    loadInquiryData(model, username);
 
-				// 다이얼로그 크기 설정
-				inquiryDialog.setSize(800, 300);
-				inquiryDialog.setLocationRelativeTo(null);
+	                    JOptionPane.showMessageDialog(inquiryDialog, "문의사항 데이터가 저장되었습니다.");
+	                } catch (SQLException ex) {
+	                    ex.printStackTrace();
+	                    JOptionPane.showMessageDialog(inquiryDialog, "데이터 저장 중 오류가 발생했습니다.");
+	                }
+	            });
 
-				// 다이얼로그 표시
-				inquiryDialog.setVisible(true);
-			}
-		});
+	            // 다이얼로그에 추가
+	            inquiryDialog.add(inputPanel, BorderLayout.CENTER);
+	            inquiryDialog.add(saveButton, BorderLayout.SOUTH);
 
-		return inquiryButton;
+	            // 다이얼로그 크기 및 위치 설정
+	            inquiryDialog.setSize(900, 500);
+	            inquiryDialog.setLocationRelativeTo(null);
+	            inquiryDialog.setVisible(true);
+	        }
+	    });
+
+	    return inquiryButton;
 	}
+
+	// JTable 갱신 메서드
+	public void loadInquiryData(DefaultTableModel model, String loginUsername) {
+	    try {
+	        HealthsysManager.getInstance().getAppConnection();
+	        PreparedStatement stmt = HealthsysManager.appConn.prepareStatement("SELECT * FROM inquiries WHERE username = ?");
+	        stmt.setString(1, loginUsername);
+	        
+	        ResultSet rs = stmt.executeQuery();
+
+	        // 기존 데이터 삭제 (중복 방지)
+	        model.setRowCount(0);
+
+	        // 결과를 DefaultTableModel에 추가
+	        while (rs.next()) {
+	            String title = rs.getString("inquiry_subject");
+	            String detail = rs.getString("inquiry_details");
+	            java.sql.Date inquiryDate = rs.getDate("inquiry_date");
+	            String status = rs.getString("status");
+	            String answer = rs.getString("answer");
+	            String username = rs.getString("username");
+
+	            // 날짜 포맷팅
+	            String formattedDate = (inquiryDate != null) ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(inquiryDate) : "";
+
+	            model.addRow(new Object[]{
+	                title,
+	                detail,
+	                formattedDate,
+	                status,
+	                answer != null ? answer : "",
+	                username
+	            });
+	        }
+	    } catch (SQLException ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "데이터 불러오기 중 오류가 발생했습니다.");
+	    }
+	}
+
 }

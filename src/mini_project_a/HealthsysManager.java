@@ -15,13 +15,13 @@ public class HealthsysManager {
 	public static Connection appConn = null;
 
 	// ORACLE DB 연결 정보 - 관리자
-	private final String ADMIN_URL = "jdbc:oracle:thin:@localhost:1521:orcl";
-	private final String ADMIN_USER = "HEALTHSYS_ADMIN";
+	private final String ADMIN_URL = "jdbc:oracle:thin:@localhost:1521:free";
+	private final String ADMIN_USER = "C##HEALTHSYS_ADMIN";
 	private final String ADMIN_PASSWORD = "ADMINHAKY";
 
 	// ORACLE DB 연결 정보 - 사용자
-	private final String APP_URL = "jdbc:oracle:thin:@localhost:1521:orcl";
-	private final String APP_USER = "HEALTHSYS_APP";
+	private final String APP_URL = "jdbc:oracle:thin:@localhost:1521:free";
+	private final String APP_USER = "C##HEALTHSYS_APP";
 	private final String APP_PASSWORD = "0000";
 
 	// static 영역에 싱글톤 객체 선언 및 생성

@@ -336,16 +336,16 @@ public class HealthCareApp extends JFrame {
 		if (selectedRow != -1) {
 			String username = (String) model.getValueAt(selectedRow, 0);
 			try {
-				HealthsysManager.getInstance().getAdminConnection();
+				HealthsysManager.getInstance().getAppConnection();
 				// inquiries 테이블에서 해당 회원의 문의 사항 삭제
-				PreparedStatement deleteInquiriesStmt = HealthsysManager.adminConn.prepareStatement(
+				PreparedStatement deleteInquiriesStmt = HealthsysManager.appConn.prepareStatement(
 						"DELETE FROM inquiries WHERE USERNAME = (SELECT USERNAME FROM members WHERE username = ?)");
 
 				deleteInquiriesStmt.setString(1, username);
 				deleteInquiriesStmt.executeUpdate();
 
 				// members 테이블에서 회원 삭제
-				PreparedStatement deleteMemberStmt = HealthsysManager.adminConn
+				PreparedStatement deleteMemberStmt = HealthsysManager.appConn
 						.prepareStatement("DELETE FROM members WHERE username = ?");
 				deleteMemberStmt.setString(1, username);
 
@@ -415,7 +415,7 @@ public class HealthCareApp extends JFrame {
 			panel.setBorder(BorderFactory.createTitledBorder("문의 내역"));
 
 			// 테이블 모델 생성 및 설정
-			DefaultTableModel tableModel = new DefaultTableModel(new Object[] { "ID", "내용", "답변" }, 0);
+			DefaultTableModel tableModel = new DefaultTableModel(new Object[] { "번호", "제목", "내용", "등록날짜", "상태", "답변", "아이디" }, 0);
 			JTable inquiryTable = new JTable(tableModel);
 			panel.add(new JScrollPane(inquiryTable), BorderLayout.CENTER);
 
@@ -423,7 +423,10 @@ public class HealthCareApp extends JFrame {
 			JPanel answerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			JTextField answerField = new JTextField(20);
 			JButton saveButton = new JButton("저장");
-			saveButton.addActionListener(e -> saveAnswer(inquiryTable, tableModel, answerField.getText()));
+			saveButton.addActionListener(e ->  {
+			    saveAnswer(inquiryTable, tableModel, answerField.getText());
+			    answerField.setText(""); // 답변 저장 후 입력 필드 초기화
+			});
 			answerPanel.add(new JLabel("답변:"));
 			answerPanel.add(answerField);
 			answerPanel.add(saveButton);
@@ -438,14 +441,18 @@ public class HealthCareApp extends JFrame {
 			try {
 				HealthsysManager.getInstance().getAppConnection();
 				PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
-						"SELECT inquiry_id, inquiry_subject, inquiry_details, inquiry_date , username FROM inquiries");
+						"SELECT * FROM inquiries");
 				ResultSet rs = stmt.executeQuery();
 
 				while (rs.next()) {
 					int inquiryId = rs.getInt("inquiry_id");
-					String content = rs.getString("content");
+					String subject = rs.getString("inquiry_subject");
+					String details = rs.getString("inquiry_details");
+					String date = rs.getString("inquiry_date");
+					String status = rs.getString("status");
 					String answer = rs.getString("answer");
-					tableModel.addRow(new Object[] { inquiryId, content, answer });
+					String username = rs.getString("username");
+					tableModel.addRow(new Object[] { inquiryId, subject, details, date, status, answer, username });
 				}
 
 			} catch (SQLException e) {
@@ -459,15 +466,16 @@ public class HealthCareApp extends JFrame {
 				int inquiryId = (int) tableModel.getValueAt(selectedRow, 0);
 
 				try {
-					HealthsysManager.getInstance().getAdminConnection();
-					PreparedStatement stmt = HealthsysManager.adminConn
-							.prepareStatement("UPDATE inquiries SET answer = ? WHERE inquiry_id = ?");
+					HealthsysManager.getInstance().getAppConnection();
+					PreparedStatement stmt = HealthsysManager.appConn
+							.prepareStatement("UPDATE inquiries SET answer = ?, status = ? WHERE inquiry_id = ?");
 
 					stmt.setString(1, answer);
-					stmt.setInt(2, inquiryId);
+					stmt.setString(2, "답변완료");
+					stmt.setInt(3, inquiryId);
 					stmt.executeUpdate();
 
-					tableModel.setValueAt(answer, selectedRow, 2);
+					tableModel.setValueAt(answer, selectedRow, 5);
 					JOptionPane.showMessageDialog(this, "답변이 저장되었습니다.");
 
 				} catch (SQLException e) {
@@ -585,8 +593,8 @@ public class HealthCareApp extends JFrame {
 				PreparedStatement stmt2 = HealthsysManager.appConn
 						.prepareStatement("SELECT COUNT(*) FROM members WHERE username = ?");
 
-				stmt.setString(1, username);
-				stmt.executeUpdate();
+				stmt2.setString(1, username);
+				stmt2.executeUpdate();
 
 				ResultSet rs2 = stmt2.executeQuery();
 
@@ -631,7 +639,7 @@ public class HealthCareApp extends JFrame {
 
 					stmt.setString(1, username);
 					stmt.setString(2, password); // 암호화된 비밀번호 저장
-					stmt.setBoolean(3, isAdmin);
+					stmt.setInt(3, 1);
 					stmt.executeUpdate();
 
 					return true;
