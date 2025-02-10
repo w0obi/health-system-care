@@ -148,7 +148,7 @@ public class HealthCareApp extends JFrame {
 			stmt.setString(1, username);
 			stmt.setString(2, hashedPassword); // 암호화된 비밀번호를 비교합니다.
 			stmt.setString(3, "1");
-			stmt.executeUpdate();
+			
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
@@ -162,14 +162,19 @@ public class HealthCareApp extends JFrame {
 
 			stmt2.setString(1, username);
 			stmt2.setString(2, hashedPassword); // 암호화된 비밀번호를 비교합니다.
-			stmt.executeUpdate();
-			isAdmin = false;
+			
+			ResultSet rs2 = stmt2.executeQuery();
+
+	        if (rs2.next()) { // 유저가 존재할 경우
+	            isAdmin = false;
+	            return true; // 일반 사용자 로그인 성공
+	        }
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return true;
+		return false;
 	}
 
 	// 마지막 로그인 시간을 업데이트하는 메서드
@@ -227,33 +232,33 @@ public class HealthCareApp extends JFrame {
 		adminTabbedPane.addTab("회원 관리", memberManagementPanel);
 
 		// 트레이너 스케줄 관리 패널 추가
-		JPanel trainerSchedulePanel = new JPanel();
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[] { "ID", "시간", "회원 이름", "수업 종류", "상태" }, 0) {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
-		JTable trainerscheduleTable = new JTable(tableModel);
-		trainerSchedulePanel.add(trainerscheduleTable);
-		adminTabbedPane.addTab("트레이너 스케줄 관리", trainerscheduleTable);
-
-		adminTabbedPane.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				int selectedIndex = adminTabbedPane.getSelectedIndex();
-				if (selectedIndex == 1) {
-					tableModel.setRowCount(0);
-					loadTrainerSchedule(tableModel, new Frame(), isAdmin);
-				}
-
-			}
-		});
+//		JPanel trainerSchedulePanel = new JPanel();
+//		DefaultTableModel tableModel = new DefaultTableModel(new Object[] { "ID", "시간", "회원 이름", "수업 종류", "상태" }, 0) {
+//			/**
+//			 * 
+//			 */
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public boolean isCellEditable(int row, int column) {
+//				return false;
+//			}
+//		};
+//		JTable trainerscheduleTable = new JTable(tableModel);
+//		trainerSchedulePanel.add(trainerscheduleTable);
+//		adminTabbedPane.addTab("트레이너 스케줄 관리", trainerscheduleTable);
+//
+//		adminTabbedPane.addChangeListener(new ChangeListener() {
+//			@Override
+//			public void stateChanged(ChangeEvent e) {
+//				int selectedIndex = adminTabbedPane.getSelectedIndex();
+//				if (selectedIndex == 1) {
+//					tableModel.setRowCount(0);
+//					loadTrainerSchedule(tableModel, new Frame(), isAdmin);
+//				}
+//
+//			}
+//		});
 
 		// 문의 사항 관리 버튼을 우측 끝으로 배치
 		JButton inquiryManagementButton = new JButton("문의 사항 관리");
@@ -475,7 +480,8 @@ public class HealthCareApp extends JFrame {
 					stmt.setInt(3, inquiryId);
 					stmt.executeUpdate();
 
-					tableModel.setValueAt(answer, selectedRow, 5);
+					tableModel.setRowCount(0); // 기존 데이터 제거
+					loadInquiryData(tableModel);
 					JOptionPane.showMessageDialog(this, "답변이 저장되었습니다.");
 
 				} catch (SQLException e) {
@@ -689,176 +695,176 @@ public class HealthCareApp extends JFrame {
 		}
 	}
 
-	class TrainerScheduleDialog extends JDialog {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private JTable scheduleTable;
-		private DefaultTableModel tableModel;
-
-		public TrainerScheduleDialog(Frame parent, boolean isAdmin) {
-			super(parent, "트레이너 스케줄 관리", true);
-			setSize(600, 400);
-			setLayout(new BorderLayout());
-
-			tableModel = new DefaultTableModel(new Object[] { "ID", "시간", "회원 이름", "수업 종류", "상태" }, 0);
-			scheduleTable = new JTable(tableModel);
-			add(new JScrollPane(scheduleTable), BorderLayout.CENTER);
-
-			loadTrainerSchedule(); // 트레이너 스케줄 로드
-
-			JPanel controlPanel = new JPanel();
-
-			JButton addButton = new JButton("일정 추가");
-			addButton.addActionListener(e -> addSchedule());
-
-			JButton updateButton = new JButton("일정 수정");
-			updateButton.addActionListener(e -> updateSchedule());
-
-			JButton deleteButton = new JButton("일정 삭제");
-			deleteButton.addActionListener(e -> deleteSchedule());
-
-			if (isAdmin) {
-				controlPanel.add(addButton);
-			}
-			controlPanel.add(updateButton);
-			controlPanel.add(deleteButton);
-
-			add(controlPanel, BorderLayout.SOUTH);
-		}
-
-		private void loadTrainerSchedule() {
-			try {
-				HealthsysManager.getInstance().getAdminConnection();
-				PreparedStatement stmt = HealthsysManager.appConn.prepareStatement("SELECT * FROM trainer_schedule");
-
-				ResultSet rs = stmt.executeQuery();
-
-				while (rs.next()) {
-					int id = rs.getInt("id");
-					String time = rs.getString("time");
-					String memberName = rs.getString("member_name");
-					String classType = rs.getString("class_type");
-					String status = rs.getString("status");
-					tableModel.addRow(new Object[] { id, time, memberName, classType, status });
-				}
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-		private void addSchedule() {
-			String time = JOptionPane.showInputDialog(this, "시간을 입력하세요:");
-			String memberName = JOptionPane.showInputDialog(this, "회원 이름을 입력하세요:");
-			String classType = JOptionPane.showInputDialog(this, "수업 종류를 입력하세요:");
-			String status = JOptionPane.showInputDialog(this, "상태를 입력하세요:");
-
-			if (time != null && memberName != null && classType != null && status != null) {
-				try {
-					HealthsysManager.getInstance().getAdminConnection();
-					PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
-							"INSERT INTO trainer_schedule (time, member_name, class_type, status) VALUES (?, ?, ?, ?)");
-
-					stmt.setString(1, time);
-					stmt.setString(2, memberName);
-					stmt.setString(3, classType);
-					stmt.setString(4, status);
-					stmt.executeUpdate();
-
-					ResultSet generatedKeys = stmt.getGeneratedKeys();
-					if (generatedKeys.next()) {
-						int id = generatedKeys.getInt(1);
-						tableModel.addRow(new Object[] { id, time, memberName, classType, status });
-					}
-
-					JOptionPane.showMessageDialog(this, "일정이 추가되었습니다.");
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(this, "일정 추가 중 오류가 발생했습니다.");
-				}
-			} else {
-				JOptionPane.showMessageDialog(this, "모든 필드를 입력해주세요.");
-			}
-		}
-
-		private void updateSchedule() {
-			int selectedRow = scheduleTable.getSelectedRow();
-			if (selectedRow != -1) {
-				String time = JOptionPane.showInputDialog(this, "새 시간 입력:", tableModel.getValueAt(selectedRow, 1));
-				String memberName = JOptionPane.showInputDialog(this, "새 회원 이름 입력:",
-						tableModel.getValueAt(selectedRow, 2));
-				String classType = JOptionPane.showInputDialog(this, "새 수업 종류 입력:",
-						tableModel.getValueAt(selectedRow, 3));
-				String status = JOptionPane.showInputDialog(this, "새 상태 입력:", tableModel.getValueAt(selectedRow, 4));
-
-				if (time != null && memberName != null && classType != null && status != null) {
-					int id = (int) tableModel.getValueAt(selectedRow, 0);
-
-					try {
-						HealthsysManager.getInstance().getAdminConnection();
-
-						PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
-								"UPDATE trainer_schedule SET time = ?, member_name = ?, class_type = ?, status = ? WHERE id = ?");
-
-						stmt.setString(1, time);
-						stmt.setString(2, memberName);
-						stmt.setString(3, classType);
-						stmt.setString(4, status);
-						stmt.setInt(5, id);
-						stmt.executeUpdate();
-
-						tableModel.setValueAt(time, selectedRow, 1);
-						tableModel.setValueAt(memberName, selectedRow, 2);
-						tableModel.setValueAt(classType, selectedRow, 3);
-						tableModel.setValueAt(status, selectedRow, 4);
-
-						JOptionPane.showMessageDialog(this, "일정이 수정되었습니다.");
-
-					} catch (SQLException e) {
-						e.printStackTrace();
-						JOptionPane.showMessageDialog(this, "일정 수정 중 오류가 발생했습니다.");
-					}
-				} else {
-					JOptionPane.showMessageDialog(this, "모든 필드를 입력해주세요.");
-				}
-			} else {
-				JOptionPane.showMessageDialog(this, "수정할 일정을 선택하세요.");
-			}
-		}
-
-		private void deleteSchedule() {
-			int selectedRow = scheduleTable.getSelectedRow();
-			if (selectedRow != -1) {
-				int confirmation = JOptionPane.showConfirmDialog(this, "정말로 삭제하시겠습니까?", "삭제 확인",
-						JOptionPane.YES_NO_OPTION);
-				if (confirmation == JOptionPane.YES_OPTION) {
-					int id = (int) tableModel.getValueAt(selectedRow, 0);
-					try {
-						HealthsysManager.getInstance().getAdminConnection();
-
-						PreparedStatement stmt = HealthsysManager.appConn
-								.prepareStatement("DELETE FROM trainer_schedule WHERE id = ?");
-
-						stmt.setInt(1, id);
-						stmt.executeUpdate();
-
-						tableModel.removeRow(selectedRow);
-						JOptionPane.showMessageDialog(this, "일정이 삭제되었습니다.");
-
-					} catch (SQLException e) {
-						e.printStackTrace();
-						JOptionPane.showMessageDialog(this, "일정 삭제 중 오류가 발생했습니다.");
-					}
-				}
-			} else {
-				JOptionPane.showMessageDialog(this, "삭제할 일정을 선택하세요.");
-			}
-		}
-	}
+//	class TrainerScheduleDialog extends JDialog {
+//
+//		/**
+//		 * 
+//		 */
+//		private static final long serialVersionUID = 1L;
+//		private JTable scheduleTable;
+//		private DefaultTableModel tableModel;
+//
+//		public TrainerScheduleDialog(Frame parent, boolean isAdmin) {
+//			super(parent, "트레이너 스케줄 관리", true);
+//			setSize(600, 400);
+//			setLayout(new BorderLayout());
+//
+//			tableModel = new DefaultTableModel(new Object[] { "ID", "시간", "회원 이름", "수업 종류", "상태" }, 0);
+//			scheduleTable = new JTable(tableModel);
+//			add(new JScrollPane(scheduleTable), BorderLayout.CENTER);
+//
+//			loadTrainerSchedule(); // 트레이너 스케줄 로드
+//
+//			JPanel controlPanel = new JPanel();
+//
+//			JButton addButton = new JButton("일정 추가");
+//			addButton.addActionListener(e -> addSchedule());
+//
+//			JButton updateButton = new JButton("일정 수정");
+//			updateButton.addActionListener(e -> updateSchedule());
+//
+//			JButton deleteButton = new JButton("일정 삭제");
+//			deleteButton.addActionListener(e -> deleteSchedule());
+//
+//			if (isAdmin) {
+//				controlPanel.add(addButton);
+//			}
+//			controlPanel.add(updateButton);
+//			controlPanel.add(deleteButton);
+//
+//			add(controlPanel, BorderLayout.SOUTH);
+//		}
+//
+//		private void loadTrainerSchedule() {
+//			try {
+//				HealthsysManager.getInstance().getAdminConnection();
+//				PreparedStatement stmt = HealthsysManager.appConn.prepareStatement("SELECT * FROM trainer_schedule");
+//
+//				ResultSet rs = stmt.executeQuery();
+//
+//				while (rs.next()) {
+//					int id = rs.getInt("id");
+//					String time = rs.getString("time");
+//					String memberName = rs.getString("member_name");
+//					String classType = rs.getString("class_type");
+//					String status = rs.getString("status");
+//					tableModel.addRow(new Object[] { id, time, memberName, classType, status });
+//				}
+//
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		private void addSchedule() {
+//			String time = JOptionPane.showInputDialog(this, "시간을 입력하세요:");
+//			String memberName = JOptionPane.showInputDialog(this, "회원 이름을 입력하세요:");
+//			String classType = JOptionPane.showInputDialog(this, "수업 종류를 입력하세요:");
+//			String status = JOptionPane.showInputDialog(this, "상태를 입력하세요:");
+//
+//			if (time != null && memberName != null && classType != null && status != null) {
+//				try {
+//					HealthsysManager.getInstance().getAdminConnection();
+//					PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
+//							"INSERT INTO trainer_schedule (time, member_name, class_type, status) VALUES (?, ?, ?, ?)");
+//
+//					stmt.setString(1, time);
+//					stmt.setString(2, memberName);
+//					stmt.setString(3, classType);
+//					stmt.setString(4, status);
+//					stmt.executeUpdate();
+//
+//					ResultSet generatedKeys = stmt.getGeneratedKeys();
+//					if (generatedKeys.next()) {
+//						int id = generatedKeys.getInt(1);
+//						tableModel.addRow(new Object[] { id, time, memberName, classType, status });
+//					}
+//
+//					JOptionPane.showMessageDialog(this, "일정이 추가되었습니다.");
+//
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//					JOptionPane.showMessageDialog(this, "일정 추가 중 오류가 발생했습니다.");
+//				}
+//			} else {
+//				JOptionPane.showMessageDialog(this, "모든 필드를 입력해주세요.");
+//			}
+//		}
+//
+//		private void updateSchedule() {
+//			int selectedRow = scheduleTable.getSelectedRow();
+//			if (selectedRow != -1) {
+//				String time = JOptionPane.showInputDialog(this, "새 시간 입력:", tableModel.getValueAt(selectedRow, 1));
+//				String memberName = JOptionPane.showInputDialog(this, "새 회원 이름 입력:",
+//						tableModel.getValueAt(selectedRow, 2));
+//				String classType = JOptionPane.showInputDialog(this, "새 수업 종류 입력:",
+//						tableModel.getValueAt(selectedRow, 3));
+//				String status = JOptionPane.showInputDialog(this, "새 상태 입력:", tableModel.getValueAt(selectedRow, 4));
+//
+//				if (time != null && memberName != null && classType != null && status != null) {
+//					int id = (int) tableModel.getValueAt(selectedRow, 0);
+//
+//					try {
+//						HealthsysManager.getInstance().getAdminConnection();
+//
+//						PreparedStatement stmt = HealthsysManager.appConn.prepareStatement(
+//								"UPDATE trainer_schedule SET time = ?, member_name = ?, class_type = ?, status = ? WHERE id = ?");
+//
+//						stmt.setString(1, time);
+//						stmt.setString(2, memberName);
+//						stmt.setString(3, classType);
+//						stmt.setString(4, status);
+//						stmt.setInt(5, id);
+//						stmt.executeUpdate();
+//
+//						tableModel.setValueAt(time, selectedRow, 1);
+//						tableModel.setValueAt(memberName, selectedRow, 2);
+//						tableModel.setValueAt(classType, selectedRow, 3);
+//						tableModel.setValueAt(status, selectedRow, 4);
+//
+//						JOptionPane.showMessageDialog(this, "일정이 수정되었습니다.");
+//
+//					} catch (SQLException e) {
+//						e.printStackTrace();
+//						JOptionPane.showMessageDialog(this, "일정 수정 중 오류가 발생했습니다.");
+//					}
+//				} else {
+//					JOptionPane.showMessageDialog(this, "모든 필드를 입력해주세요.");
+//				}
+//			} else {
+//				JOptionPane.showMessageDialog(this, "수정할 일정을 선택하세요.");
+//			}
+//		}
+//
+//		private void deleteSchedule() {
+//			int selectedRow = scheduleTable.getSelectedRow();
+//			if (selectedRow != -1) {
+//				int confirmation = JOptionPane.showConfirmDialog(this, "정말로 삭제하시겠습니까?", "삭제 확인",
+//						JOptionPane.YES_NO_OPTION);
+//				if (confirmation == JOptionPane.YES_OPTION) {
+//					int id = (int) tableModel.getValueAt(selectedRow, 0);
+//					try {
+//						HealthsysManager.getInstance().getAdminConnection();
+//
+//						PreparedStatement stmt = HealthsysManager.appConn
+//								.prepareStatement("DELETE FROM trainer_schedule WHERE id = ?");
+//
+//						stmt.setInt(1, id);
+//						stmt.executeUpdate();
+//
+//						tableModel.removeRow(selectedRow);
+//						JOptionPane.showMessageDialog(this, "일정이 삭제되었습니다.");
+//
+//					} catch (SQLException e) {
+//						e.printStackTrace();
+//						JOptionPane.showMessageDialog(this, "일정 삭제 중 오류가 발생했습니다.");
+//					}
+//				}
+//			} else {
+//				JOptionPane.showMessageDialog(this, "삭제할 일정을 선택하세요.");
+//			}
+//		}
+//	}
 
 	public static void main(String[] args) {
 		new HealthCareApp(); // 프로그램 실행

@@ -150,8 +150,6 @@ public class HealthManagementProgram extends JFrame {
 		centerPanel.add(photo1Label);
 		centerPanel.add(photo2Label);
 
-		updatePhotos("nomal");
-		
 		centerPanel.add(new JLabel("오늘 날짜를 입력하세요 ex)YYYY-MM-DD:"));
 		LocalDate today = LocalDate.now();
 		dateField = new JTextField(String.valueOf(today)); // 현재 날짜로 기본값 설정
@@ -187,24 +185,9 @@ public class HealthManagementProgram extends JFrame {
 	public void updatePhotos(String exercise) {
 		if (exercise != null) {
 			switch (exercise) {
-			case "nomal":
-				ImageIcon icon = new ImageIcon(getClass().getResource("/mini_project_a/img/women.png"));
-				Image img = icon.getImage();
-				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
-				icon = new ImageIcon(img);
-
-				photo1Label.setIcon(icon);
-				
-				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/running.png"));
-				img = icon.getImage();
-				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
-				icon = new ImageIcon(img);
-
-				photo2Label.setIcon(icon);
-				break;
 			case "팔굽혀펴기":
-				icon = new ImageIcon(getClass().getResource("/mini_project_a/img/push1.png"));
-				img = icon.getImage();
+				ImageIcon icon = new ImageIcon(getClass().getResource("/mini_project_a/img/push1.png"));
+				Image img = icon.getImage();
 				img = img.getScaledInstance(photo1Label.getWidth(), photo1Label.getHeight(), Image.SCALE_SMOOTH);
 				icon = new ImageIcon(img);
 
@@ -441,14 +424,19 @@ public class HealthManagementProgram extends JFrame {
 		panel.add(leftPanel, BorderLayout.WEST);
 		panel.add(rightPanel, BorderLayout.CENTER);
 
-		// 수정 버튼 추가
 		JButton editButton = new JButton("수정");
 		JButton saveButton = new JButton("저장");
+		JButton cancelButton = new JButton("취소");
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(editButton);
 		buttonPanel.add(saveButton);
+		buttonPanel.add(cancelButton);
 		panel.add(buttonPanel, BorderLayout.SOUTH);
+		
+		// 처음에는 "취소", "저장" 버튼 숨기기
+		cancelButton.setVisible(false);
+		saveButton.setVisible(false);
 
 		// -------------------------------------
 		// 수정 버튼 클릭 시 입력 필드 활성화
@@ -459,7 +447,28 @@ public class HealthManagementProgram extends JFrame {
 				ageField.setEditable(true);
 				heightField.setEditable(true);
 				weightField.setEditable(true);
+				
+				// "수정" 버튼 숨기고 "취소", "저장" 버튼 표시
+		        editButton.setVisible(false);
+		        cancelButton.setVisible(true);
+		        saveButton.setVisible(true);
 			}
+		});
+		
+		// 취소 버튼 클릭 시
+		cancelButton.addActionListener(e -> {
+		    fetchPersonalInfo(username); // 기존 데이터 다시 불러오기
+
+		    // 필드 비활성화
+		    nameField.setEditable(false);
+		    ageField.setEditable(false);
+		    heightField.setEditable(false);
+		    weightField.setEditable(false);
+
+		    // 버튼 상태 변경
+		    editButton.setVisible(true);
+		    saveButton.setVisible(false);
+		    cancelButton.setVisible(false);
 		});
 
 		// 저장 버튼 클릭 시 이벤트 처리
@@ -503,6 +512,14 @@ public class HealthManagementProgram extends JFrame {
 						ageField.setEditable(false);
 						heightField.setEditable(false);
 						weightField.setEditable(false);
+						
+						// **변경된 데이터 새로고침**
+		                fetchPersonalInfo(username);
+		                
+		                // 버튼 상태 복구
+		                editButton.setVisible(true);
+		                cancelButton.setVisible(false);
+		                saveButton.setVisible(false);
 					} else {
 						JOptionPane.showMessageDialog(panel, "회원 정보를 업데이트할 수 없습니다.");
 					}
@@ -511,7 +528,7 @@ public class HealthManagementProgram extends JFrame {
 				}
 			}
 		});
-
+		
 		return panel;
 	}
 
@@ -592,6 +609,7 @@ public class HealthManagementProgram extends JFrame {
 
 	            // 저장 버튼 (아래쪽)
 	            JButton saveButton = new JButton("저장");
+	            
 	            saveButton.addActionListener(ev -> {
 	                String title = titleField.getText();
 	                String detail = detailArea.getText();
@@ -619,6 +637,10 @@ public class HealthManagementProgram extends JFrame {
 
 	                    // 데이터 저장 후 JTable 갱신 (중복 방지)
 	                    loadInquiryData(model, username);
+	                    
+	                    // 입력 필드 초기화
+	                    titleField.setText("");
+	                    detailArea.setText("");
 
 	                    JOptionPane.showMessageDialog(inquiryDialog, "문의사항 데이터가 저장되었습니다.");
 	                } catch (SQLException ex) {
@@ -632,7 +654,7 @@ public class HealthManagementProgram extends JFrame {
 	            inquiryDialog.add(saveButton, BorderLayout.SOUTH);
 
 	            // 다이얼로그 크기 및 위치 설정
-	            inquiryDialog.setSize(900, 500);
+	            inquiryDialog.setSize(800, 600);
 	            inquiryDialog.setLocationRelativeTo(null);
 	            inquiryDialog.setVisible(true);
 	        }
